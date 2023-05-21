@@ -1,7 +1,7 @@
 # cm2js
 Circuit Maker 2 save generation and manipulation package
 
-This is a js version of (cm2py)[https://github.com/QEStudios/cm2py] made by (SKM GEEK)[https://github.com/QEStudios]
+This is a js version of [cm2py](https://github.com/QEStudios/cm2py) made by [SKM GEEK](https://github.com/QEStudios)
 
 ## Installation
 Use the package manager [npm](https://www.npmjs.com/) to install cm2js.
