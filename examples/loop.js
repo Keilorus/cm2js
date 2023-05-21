@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+// This code generates a loop with a specified length and block type.
 import { Save, Block, Connection, BlockId } from "cm2js"
 
 const length = 8

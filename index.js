@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const BlockId = {
     Nor: 0,
     And: 1,
