@@ -20,7 +20,12 @@ class Save {
         this.connections = connections
     }
 
-    addBlock(block) {
+    addBlock(block, checkDuplicate = false) {
+        if (checkDuplicate && this.blocks.find(findBlock =>
+            findBlock.x == block.x &&
+            findBlock.y == block.y &&
+            findBlock.z == block.z)) return;
+
         this.blocks.push(block)
         return block
     }
@@ -48,7 +53,7 @@ class Save {
 
             saveString = saveString.slice(0, saveString.length - 1)
         }
-        
+
         saveString += "?"
 
         if (this.connections.length > 0) {

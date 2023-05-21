@@ -1,22 +1,25 @@
 #!/usr/bin/env node
 // This code generates a sphere with a specified radius, resolution and block type.
-import { Save, Block, Connection, BlockId } from "cm2js"
+import { Save, Block, BlockId } from "cm2js"
 
 const radius = 10
-const resolution = 20
+const resolution = 10
 const blockId = BlockId.Or
 
 const save = new Save()
 
-const TAU = Math.PI * 2
-const resTau = resolution / TAU
+function sphericalToCartesian(radius, inc, azimuth) {
+    return [
+        radius * Math.sin(inc) * Math.cos(azimuth),
+        radius * Math.cos(inc),
+        radius * Math.sin(inc) * Math.sin(azimuth)
+    ]
+}
 
-for (let r = 0; r < Math.floor(resolution / 2); r++) {
-    for (let i = 0; i < resolution; i++) {
-        const x = Math.floor(Math.sin(i / resTau)) * radius * Math.cos(r / resTau)
-        const y = Math.floor(Math.cos(i / resTau ) + 1) * radius
-        const z = Math.floor(Math.sin(r / resTau)) * radius * Math.sin(i / resTau)
-        save.addBlock(new Block(blockId, x, y, z))
+for (let incRes = 0; incRes < resolution; incRes++) {
+    for (let aziRes = 0; aziRes < resolution; aziRes++) {
+        const [ x, y, z ] = sphericalToCartesian(radius, incRes / resolution * Math.PI, aziRes / resolution * Math.PI * 2)
+        save.addBlock(new Block(blockId, x, y + radius, z), true)
     }
 }
 
