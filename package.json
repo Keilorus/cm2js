@@ -1,0 +1,23 @@
+{
+  "name": "cm2js",
+  "version": "0.1.0",
+  "description": "Circuit Maker 2 save generation and manipulation package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Keilorus/cm2js.git"
+  },
+  "keywords": [
+    "cm2js"
+  ],
+  "author": "Keilorus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Keilorus/cm2js/issues"
+  },
+  "homepage": "https://github.com/Keilorus/cm2js#readme"
+}
