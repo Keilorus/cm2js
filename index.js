@@ -48,7 +48,10 @@ class Save {
 
         if (this.blocks.length > 0) {
             for (const block of this.blocks) {
-                saveString += `${block.id},${+ block.state},${block.x},${block.y},${block.z},;`
+                saveString += `${block.id},${+ block.state},${block.x},${block.y},${block.z},`
+                if (block instanceof LedBlock) saveString += `${block.r}+${block.g}+${block.b}`;
+                if (block instanceof SoundBlock) saveString += block.frequency
+                saveString += ";"
             }
 
             saveString = saveString.slice(0, saveString.length - 1)
@@ -69,15 +72,63 @@ class Save {
 
         return saveString
     }
+
+    import(saveString) {
+        const [ blocks, connections ] = saveString.split("?")
+        const blockPool = []
+
+        if (blocks) {
+            for (const blockString of blocks.split(";")) {
+                const [ id, numState, x, y, z, extra ] = blockString.split(",")
+                const state = !! Number(numState)
+
+                if (id == BlockId.Led) {
+                    const [ r, g, b ] = extra.split("+")
+                    blockPool.push(this.addBlock(new LedBlock(x, y, z, state, r, g, b)))
+                    continue
+                }
+
+                if (id == BlockId.Sound) {
+                    blockPool.push(this.addBlock(new SoundBlock(x, y, z, state, extra)))
+                    continue
+                }
+
+                blockPool.push(this.addBlock(new Block(id, x, y, z, state)))
+            }
+        }
+
+        if (connections) {
+            for (const connectionString of connections.split(";")) {
+                const [ source, target ] = connectionString.split(",")
+                this.addConnection(new Connection(blockPool[source - 1], blockPool[target - 1]))
+            }
+        }
+    }
 }
 
 class Block {
     constructor (id, x, y, z, state = false) {
-        this.id = id
-        this.x = x
-        this.y = y
-        this.z = z
+        this.id = Number(id)
+        this.x = Number(x)
+        this.y = Number(y)
+        this.z = Number(z)
         this.state = state
+    }
+}
+
+class LedBlock extends Block {
+    constructor (x, y, z, state = false, r = 127, g = 127, b = 127) {
+        super(BlockId.Led, x, y, z, state)
+        this.r = Number(r)
+        this.g = Number(g)
+        this.b = Number(b)
+    }
+}
+
+class SoundBlock extends Block {
+    constructor (x, y, z, state = false, frequency = 1567.98) {
+        super(BlockId.Sound, x, y, z, state)
+        this.frequency = Number(frequency)
     }
 }
 
