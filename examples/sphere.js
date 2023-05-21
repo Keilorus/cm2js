@@ -11,7 +11,7 @@ const save = new Save()
 const TAU = Math.PI * 2
 const resTau = resolution / TAU
 
-for (let r = 0; i < Math.floor(resolution / 2); i++) {
+for (let r = 0; r < Math.floor(resolution / 2); r++) {
     for (let i = 0; i < resolution; i++) {
         const x = Math.floor(Math.sin(i / resTau)) * radius * Math.cos(r / resTau)
         const y = Math.floor(Math.cos(i / resTau ) + 1) * radius
