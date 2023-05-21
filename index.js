@@ -41,18 +41,27 @@ class Save {
     export() {
         let saveString = ""
 
-        for (const block of this.blocks) {
-            saveString += `${block.id},${+ block.state},${block.x},${block.y},${block.z},;`
+        if (this.blocks.length > 0) {
+            for (const block of this.blocks) {
+                saveString += `${block.id},${+ block.state},${block.x},${block.y},${block.z},;`
+            }
+
+            saveString = saveString.slice(0, saveString.length - 1)
+        }
+        
+        saveString += "?"
+
+        if (this.connections.length > 0) {
+            for (const connection of this.connections) {
+                saveString += this.blocks.findIndex(block => block === connection.source) + 1 + ","
+                saveString += this.blocks.findIndex(block => block === connection.target) + 1 + ";"
+            }
+
+            saveString = saveString.slice(0, saveString.length - 1)
         }
 
-        saveString = saveString.slice(0, saveString.length - 1) + "?"
+        saveString += "?"
 
-        for (const connection of Object.values(this.connections)) {
-            saveString += this.blocks.findIndex(block => block === connection.source) + 1 + ","
-            saveString += this.blocks.findIndex(block => block === connection.target) + 1 + ";"
-        }
-
-        saveString = saveString.slice(0, saveString.length - 1) + "?"
         return saveString
     }
 }
