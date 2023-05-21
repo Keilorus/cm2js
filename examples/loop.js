@@ -1,5 +1,4 @@
-const { Save, Block, Connection, BlockId } = require("cm2js")
-// import { Save, Block, Connection, BlockId } from "cm2js" if youre using es6 module
+import { Save, Block, Connection, BlockId } from "cm2js"
 
 const length = 8
 const blockId = BlockId.Or
