@@ -46,29 +46,24 @@ class Save {
     export() {
         let saveString = ""
 
-        if (this.blocks.length > 0) {
-            for (const block of this.blocks) {
-                saveString += `${block.id},${+ block.state},${block.x},${block.y},${block.z},`
-                if (block instanceof LedBlock) saveString += `${block.r}+${block.g}+${block.b}`;
-                if (block instanceof SoundBlock) saveString += block.frequency
-                saveString += ";"
-            }
+        const blocksStrings = []
 
-            saveString = saveString.slice(0, saveString.length - 1)
+        for (const block of this.blocks) {
+            blocksStrings.push(`${block.id},${+ block.state},${block.x},${block.y},${block.z},${block.properties.join("+")}`)
         }
 
-        saveString += "?"
+        saveString += blocksStrings.join(";") + "?"
 
-        if (this.connections.length > 0) {
-            for (const connection of this.connections) {
-                saveString += this.blocks.findIndex(block => block === connection.source) + 1 + ","
-                saveString += this.blocks.findIndex(block => block === connection.target) + 1 + ";"
-            }
+        const connectionStrings = []
 
-            saveString = saveString.slice(0, saveString.length - 1)
+        for (const connection of this.connections) {
+            connectionStrings.push(
+                this.blocks.findIndex(block => block === connection.source) + 1 + "," +
+                this.blocks.findIndex(block => block === connection.target) + 1
+            )
         }
 
-        saveString += "?"
+        saveString += connectionStrings.join(";") + "?"
 
         return saveString
     }
@@ -79,21 +74,9 @@ class Save {
 
         if (blocks) {
             for (const blockString of blocks.split(";")) {
-                const [ id, numState, x, y, z, extra ] = blockString.split(",")
-                const state = !! Number(numState)
+                const [ id, state, x, y, z, props ] = blockString.split(",")
 
-                if (id == BlockId.Led) {
-                    const [ r, g, b ] = extra.split("+")
-                    blockPool.push(this.addBlock(new LedBlock(x, y, z, state, r, g, b)))
-                    continue
-                }
-
-                if (id == BlockId.Sound) {
-                    blockPool.push(this.addBlock(new SoundBlock(x, y, z, state, extra)))
-                    continue
-                }
-
-                blockPool.push(this.addBlock(new Block(id, x, y, z, state)))
+                blockPool.push(this.addBlock(new Block(id, x, y, z, state, props.split("+"))))
             }
         }
 
@@ -107,28 +90,13 @@ class Save {
 }
 
 class Block {
-    constructor (id, x, y, z, state = false) {
-        this.id = Number(id)
+    constructor (id, x, y, z, state = false, properties = {}) {
+        this.id = parseInt(id)
         this.x = Number(x)
         this.y = Number(y)
         this.z = Number(z)
-        this.state = state
-    }
-}
-
-class LedBlock extends Block {
-    constructor (x, y, z, state = false, r = 127, g = 127, b = 127) {
-        super(BlockId.Led, x, y, z, state)
-        this.r = Number(r)
-        this.g = Number(g)
-        this.b = Number(b)
-    }
-}
-
-class SoundBlock extends Block {
-    constructor (x, y, z, state = false, frequency = 1567.98) {
-        super(BlockId.Sound, x, y, z, state)
-        this.frequency = Number(frequency)
+        this.state = !! Number(state)
+        this.properties = properties.map(prop => Number(prop))
     }
 }
 
