@@ -79,7 +79,7 @@ class Save {
 
         for (const building of this.buildings) {
             buildingStrings.push(`${building.name},${building.cframe.join(",")},${building.connections.map(
-                connection => + connection.sending + this.blocks.findIndex(block => block === connection.block) + 1
+                connection => connection ? `${+ connection.sending}${this.blocks.findIndex(block => block === connection.block) + 1}` : ""
             ).join(",")}`)
         }
 
@@ -123,17 +123,17 @@ class Save {
                     r00, r01, r02,
                     r10, r11, r12,
                     r20, r21, r22
-                ], connectionString.split(",").map(connection => ({
+                ], connectionString.map(connection => connection ? ({
                     sending: !! Number(connection.substring(0, 1)),
-                    block: blockPool[Number(connection.substring(1))]
-                }) )))
+                    block: blockPool[connection.substring(1) - 1]
+                }) : null )))
             }
         }
     }
 }
 
 class Block {
-    constructor (id, x, y, z, state = false, properties = {}) {
+    constructor (id, x, y, z, state = false, properties = []) {
         this.id = parseInt(id)
         this.x = Number(x)
         this.y = Number(y)
@@ -153,7 +153,7 @@ class Connection {
 class Building {
     constructor (name, cframe, connections) {
         this.name = name
-        this.cframe = cframe
+        this.cframe = cframe.map(number => Number(number))
         this.connections = connections
     }
 }
