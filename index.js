@@ -15,9 +15,10 @@ const BlockId = {
 }
 
 class Save {
-    constructor (blocks = [], connections = []) {
+    constructor (blocks = [], connections = [], buildings = []) {
         this.blocks = blocks
         this.connections = connections
+        this.buildings = buildings
     }
 
     addBlock(block, checkDuplicate = false) {
@@ -35,12 +36,21 @@ class Save {
         return connection
     }
 
+    addBuilding(building) {
+        this.buildings.push(building)
+        return building
+    }
+
     removeBlock(block) {
         this.blocks.splice(this.blocks.findIndex(findBlock => findBlock === block), 1)
     }
 
     removeConnection(connection) {
         this.connections.splice(this.connections.findIndex(findConnection => findConnection === connection), 1)
+    }
+
+    removeBuilding(building) {
+        this.buildings.splice(this.buildings.findIndex(findBuilding => findBuilding === building), 1)
     }
 
     export() {
@@ -65,11 +75,21 @@ class Save {
 
         saveString += connectionStrings.join(";") + "?"
 
+        const buildingStrings = []
+
+        for (const building of this.buildings) {
+            buildingStrings.push(`${building.name},${building.cframe.join(",")},${building.connections.map(
+                connection => + connection.sending + this.blocks.findIndex(block => block === connection.block) + 1
+            ).join(",")}`)
+        }
+
+        saveString += buildingStrings.join(";") + "?"
+
         return saveString
     }
 
     import(saveString) {
-        const [ blocks, connections ] = saveString.split("?")
+        const [ blocks, connections, buildings ] = saveString.split("?")
         const blockPool = []
 
         if (blocks) {
@@ -84,6 +104,29 @@ class Save {
             for (const connectionString of connections.split(";")) {
                 const [ source, target ] = connectionString.split(",")
                 this.addConnection(new Connection(blockPool[source - 1], blockPool[target - 1]))
+            }
+        }
+
+        if (buildings) {
+            for (const buildingString of buildings.split(";")) {
+                const [
+                    name,
+                    x, y, z,
+                    r00, r01, r02,
+                    r10, r11, r12,
+                    r20, r21, r22,
+                    ...connectionString
+                ] = buildingString.split(",")
+
+                this.addBuilding(new Building(name, [
+                    x, y, z,
+                    r00, r01, r02,
+                    r10, r11, r12,
+                    r20, r21, r22
+                ], connectionString.split(",").map(connection => ({
+                    sending: !! Number(connection.substring(0, 1)),
+                    block: blockPool[Number(connection.substring(1))]
+                }) )))
             }
         }
     }
@@ -107,4 +150,12 @@ class Connection {
     }
 }
 
-export { Save, Block, Connection, BlockId }
+class Building {
+    constructor (name, cframe, connections) {
+        this.name = name
+        this.cframe = cframe
+        this.connections = connections
+    }
+}
+
+export { Save, Block, Connection, Building, BlockId }
